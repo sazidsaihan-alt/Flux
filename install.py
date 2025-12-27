@@ -1,15 +1,34 @@
 import os
 import sys
+import subprocess
 
-def install():
-    path = os.getcwd()
-    print(f"Installing Flux from: {path}")
+def install_flux():
+    print("--- Flux Language Installer (Windows) ---")
     
-    # This command adds the current folder to the Windows User PATH
-    os.system(f'setx PATH "%PATH%;{path}"')
+    # 1. Get the current directory where Flux is located
+    current_dir = os.path.dirname(os.path.abspath(__file__))
     
-    print("\nFlux has been added to your PATH!")
-    print("Please restart your terminal and type 'flux' to begin.")
+    try:
+        # 2. Add this folder to the User PATH via Windows Command Line
+        # We use 'setx' to make it permanent
+        print(f"Adding {current_dir} to your System Path...")
+        
+        # Get existing path to avoid duplicates
+        output = subprocess.check_output(['reg', 'query', 'HKCU\\Environment', '/v', 'Path'], shell=True).decode()
+        if current_dir.lower() in output.lower():
+            print("(!) Flux is already in your Path.")
+        else:
+            os.system(f'setx PATH "%PATH%;{current_dir}"')
+            print("✔ Success: Path updated.")
+
+        print("\n--- Installation Complete! ---")
+        print("1. Close this terminal.")
+        print("2. Open a NEW terminal.")
+        print("3. Type 'flux' to start coding!")
+        
+    except Exception as e:
+        print(f"✘ Error: {e}")
+        print("Please try running this script as an Administrator.")
 
 if __name__ == "__main__":
-    install()
+    install_flux()
